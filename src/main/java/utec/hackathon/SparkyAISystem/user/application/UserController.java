@@ -3,8 +3,9 @@ package utec.hackathon.SparkyAISystem.user.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utec.hackathon.SparkyAISystem.user.domain.UserService;
+import utec.hackathon.SparkyAISystem.user.domain.Role;
 import utec.hackathon.SparkyAISystem.user.domain.User;
+import utec.hackathon.SparkyAISystem.user.domain.UserService;
 import utec.hackathon.SparkyAISystem.user.dto.UserRequestDto;
 import utec.hackathon.SparkyAISystem.user.dto.UserResponseDto;
 import java.util.List;
@@ -21,18 +22,26 @@ public class UserController {
             @PathVariable Long companyId,
             @RequestBody UserRequestDto dto
     ) {
+        // Inicializar usuario con valores DTO
         User u = new User();
         u.setEmail(dto.getEmail());
         u.setPassword(dto.getPassword());
         u.setName(dto.getName());
         u.setActive(dto.isActive());
+        // Asignar rol y flags de cuenta
+        u.setRole(Role.USER);
+        u.setExpired(false);
+        u.setLocked(false);
+        u.setCredentialsExpired(false);
+        // Crear en servicio
         User saved = service.create(u, companyId);
-        UserResponseDto res = mapToDto(saved);
-        return ResponseEntity.ok(res);
+        return ResponseEntity.ok(mapToDto(saved));
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDto>> list(@PathVariable Long companyId) {
+    public ResponseEntity<List<UserResponseDto>> list(
+            @PathVariable Long companyId
+    ) {
         List<User> users = service.findAllByCompany(companyId);
         List<UserResponseDto> result = users.stream()
                 .map(this::mapToDto)
@@ -42,6 +51,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> get(
+            @PathVariable Long companyId,
             @PathVariable Long id
     ) {
         User u = service.findById(id);
@@ -50,9 +60,11 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> update(
+            @PathVariable Long companyId,
             @PathVariable Long id,
             @RequestBody UserRequestDto dto
     ) {
+        // Solo actualiza campos permitidos
         User u = new User();
         u.setName(dto.getName());
         u.setActive(dto.isActive());
@@ -75,3 +87,4 @@ public class UserController {
         );
         return dto;
     }
+}
