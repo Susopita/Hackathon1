@@ -5,7 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utec.hackathon.SparkyAISystem.user.domain.UserService;
 import utec.hackathon.SparkyAISystem.user.domain.User;
+import utec.hackathon.SparkyAISystem.user.dto.UserRequestDto;
+import utec.hackathon.SparkyAISystem.user.dto.UserResponseDto;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/company/{companyId}/users")
@@ -14,31 +17,61 @@ public class UserController {
     private final UserService service;
 
     @PostMapping
-    public ResponseEntity<User> create(
+    public ResponseEntity<UserResponseDto> create(
             @PathVariable Long companyId,
-            @RequestBody User user
+            @RequestBody UserRequestDto dto
     ) {
-        return ResponseEntity.ok(service.create(user, companyId));
+        User u = new User();
+        u.setEmail(dto.getEmail());
+        u.setPassword(dto.getPassword());
+        u.setName(dto.getName());
+        u.setActive(dto.isActive());
+        User saved = service.create(u, companyId);
+        UserResponseDto res = mapToDto(saved);
+        return ResponseEntity.ok(res);
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> list(@PathVariable Long companyId) {
-        return ResponseEntity.ok(service.findAllByCompany(companyId));
+    public ResponseEntity<List<UserResponseDto>> list(@PathVariable Long companyId) {
+        List<User> users = service.findAllByCompany(companyId);
+        List<UserResponseDto> result = users.stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> get(
-            @PathVariable Long companyId,
+    public ResponseEntity<UserResponseDto> get(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(service.findById(id));
+        User u = service.findById(id);
+        return ResponseEntity.ok(mapToDto(u));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(
+    public ResponseEntity<UserResponseDto> update(
             @PathVariable Long id,
-            @RequestBody User user
+            @RequestBody UserRequestDto dto
     ) {
-        return ResponseEntity.ok(service.update(id, user));
+        User u = new User();
+        u.setName(dto.getName());
+        u.setActive(dto.isActive());
+        User updated = service.update(id, u);
+        return ResponseEntity.ok(mapToDto(updated));
     }
-}
+
+    private UserResponseDto mapToDto(User u) {
+        UserResponseDto dto = new UserResponseDto();
+        dto.setId(u.getId());
+        dto.setEmail(u.getEmail());
+        dto.setName(u.getName());
+        dto.setActive(u.isActive());
+        dto.setCompanyId(u.getCompany().getId());
+        dto.setRequestIds(
+                u.getRequests().stream().map(r -> r.getId()).collect(Collectors.toList())
+        );
+        dto.setLimitIds(
+                u.getLimits().stream().map(l -> l.getId()).collect(Collectors.toList())
+        );
+        return dto;
+    }
