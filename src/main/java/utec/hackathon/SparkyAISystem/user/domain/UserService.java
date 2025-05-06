@@ -1,4 +1,4 @@
-package utec.hackathon.SparkyAISystem.user.application;
+package utec.hackathon.SparkyAISystem.user.domain;
 
 import utec.hackathon.SparkyAISystem.user.domain.User;
 import java.util.List;

@@ -1,9 +1,9 @@
-package utec.hackathon.SparkyAISystem.controller.user;
+package utec.hackathon.SparkyAISystem.user.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utec.hackathon.SparkyAISystem.user.application.UserService;
+import utec.hackathon.SparkyAISystem.user.domain.UserService;
 import utec.hackathon.SparkyAISystem.user.domain.User;
 import java.util.List;
 

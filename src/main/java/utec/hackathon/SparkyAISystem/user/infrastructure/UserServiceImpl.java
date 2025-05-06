@@ -3,7 +3,7 @@ package utec.hackathon.SparkyAISystem.user.infrastructure;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import utec.hackathon.SparkyAISystem.user.application.UserService;
+import utec.hackathon.SparkyAISystem.user.domain.UserService;
 import utec.hackathon.SparkyAISystem.user.domain.User;
 import utec.hackathon.SparkyAISystem.company.infrastructure.CompanyRepository;
 import java.util.List;
