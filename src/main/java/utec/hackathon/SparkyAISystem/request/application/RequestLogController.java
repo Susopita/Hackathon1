@@ -3,32 +3,31 @@ package utec.hackathon.SparkyAISystem.request.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import utec.hackathon.SparkyAISystem.request.domain.RequestLog;
-import utec.hackathon.SparkyAISystem.request.domain.RequestLogService;
-import utec.hackathon.SparkyAISystem.user.infrastructure.UserRepository;
-import utec.hackathon.SparkyAISystem.user.domain.User;
+import utec.hackathon.SparkyAISystem.request.dto.RequestLogRequestDto;
+import utec.hackathon.SparkyAISystem.request.dto.RequestLogResponseDto;
 import java.util.List;
+
+// Importa el servicio
+import utec.hackathon.SparkyAISystem.request.domain.RequestLogService;
 
 @RestController
 @RequestMapping("/api/user/{userId}/requests")
 @RequiredArgsConstructor
 public class RequestLogController {
     private final RequestLogService service;
-    private final UserRepository userRepo;
 
     @PostMapping
-    public ResponseEntity<RequestLog> create(
+    public ResponseEntity<RequestLogResponseDto> create(
             @PathVariable Long userId,
-            @RequestBody RequestLog log
+            @RequestBody RequestLogRequestDto dto
     ) {
-        User u = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        log.setUser(u);
-        return ResponseEntity.ok(service.log(log));
+        return ResponseEntity.ok(service.log(userId, dto));
     }
 
     @GetMapping
-    public ResponseEntity<List<RequestLog>> list(@PathVariable Long userId) {
+    public ResponseEntity<List<RequestLogResponseDto>> list(
+            @PathVariable Long userId
+    ) {
         return ResponseEntity.ok(service.findByUser(userId));
     }
 }
